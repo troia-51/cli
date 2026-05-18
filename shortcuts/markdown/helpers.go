@@ -5,6 +5,7 @@ package markdown
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -112,6 +113,42 @@ func finalMarkdownFileName(spec markdownUploadSpec) string {
 	return filepath.Base(spec.FilePath)
 }
 
+func resolveMarkdownOverwriteFileName(runtime *common.RuntimeContext, spec markdownUploadSpec) (string, error) {
+	fileName := strings.TrimSpace(spec.FileName)
+	if fileName == "" && spec.FileSet {
+		fileName = filepath.Base(spec.FilePath)
+	}
+	if fileName == "" {
+		remoteName, err := fetchMarkdownFileName(runtime, spec.FileToken)
+		if err != nil {
+			return "", err
+		}
+		fileName = strings.TrimSpace(remoteName)
+	}
+	if fileName == "" {
+		fileName = spec.FileToken + ".md"
+	}
+	return fileName, nil
+}
+
+func openMarkdownDownload(ctx context.Context, runtime *common.RuntimeContext, fileToken string) (*http.Response, error) {
+	resp, err := runtime.DoAPIStream(ctx, &larkcore.ApiReq{
+		HttpMethod: http.MethodGet,
+		ApiPath:    fmt.Sprintf("/open-apis/drive/v1/files/%s/download", validate.EncodePathSegment(fileToken)),
+	})
+	if err != nil {
+		return nil, output.ErrNetwork("download failed: %s", err)
+	}
+	return resp, nil
+}
+
+func validateNonEmptyMarkdownSize(size int64) error {
+	if size == 0 {
+		return output.ErrValidation("%s", markdownEmptyContentError)
+	}
+	return nil
+}
+
 func markdownSourceSize(runtime *common.RuntimeContext, spec markdownUploadSpec) (int64, error) {
 	var size int64
 	if spec.ContentSet {
@@ -127,8 +164,8 @@ func markdownSourceSize(runtime *common.RuntimeContext, spec markdownUploadSpec)
 		}
 		size = info.Size()
 	}
-	if size == 0 {
-		return 0, output.ErrValidation("%s", markdownEmptyContentError)
+	if err := validateNonEmptyMarkdownSize(size); err != nil {
+		return 0, err
 	}
 	return size, nil
 }
