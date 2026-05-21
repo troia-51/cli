@@ -1,10 +1,10 @@
 ---
 name: lark-apps
-description: "飞书妙搭应用（lark-cli apps）：把本地 HTML 文件或目录部署为可访问、可分享的妙搭应用（静态网站 / Web 页面），返回访问 URL；并提供应用创建、更新、列出、设置可用范围（specific 指定可见 / public 互联网公开 / tenant 企业全员）等管理能力。当用户说『用 HTML / 网页开发 PPT / 幻灯片 / 演示文稿 / 可演示的 demo』、『部署 / 发布 HTML / 静态网站 / 网页 / dist 目录』、『把 /xxx 中的 HTML 文件用 lark-cli 部署 / 发到妙搭』、『开发一个 xxx 并部署成可以分享的网站 / 可访问的链接 / 可分享 URL』、『生成一个可以发给别人看的 PPT / 页面 / demo』，或提到 妙搭 / miaoda / apps / app_id / 可用范围 / open-to-tenant / open-to-public 等关键词时使用。**部署策略：用户明示『部署 / 发布 / 分享 / 可访问 / 可分享 URL』时直接走 `apps +html-publish` 自动部署并返回 URL；用户只说『可演示 / 写一个 PPT / 做个 demo』等模糊意图时，HTML 写完后先询问『要部署到妙搭以便分享吗？』再决定。**"
+description: "把本地 HTML 文件或目录部署到飞书妙搭（Miaoda），生成可分享访问的 Web 页面并返回 URL；管理应用的创建、更新、列表和访问范围。当用户要把 HTML、静态网站或 Web demo 发布成可分享链接，或提到妙搭 / Miaoda 时使用。不用于：上传普通文件到云空间（用 lark-drive）、编辑飞书云文档内容（用 lark-doc）、创建飞书原生幻灯片 / 演示文稿（用 lark-slides）。"
 metadata:
   requires:
     bins: ["lark-cli"]
-  cliHelp: "lark-cli apps --help; lark-cli apps +create --help; lark-cli apps +html-publish --help; lark-cli apps +access-scope-set --help; lark-cli apps +update --help"
+  cliHelp: "lark-cli apps --help"
 ---
 
 # apps (v1)
@@ -15,6 +15,10 @@ lark-cli apps +create           --name "客户调研问卷" --app-type HTML
 lark-cli apps +html-publish     --app-id app_xxx --path ./dist
 lark-cli apps +access-scope-set --app-id app_xxx --scope tenant
 ```
+
+## 品牌可用性（先做）
+
+跑 `lark-cli apps --help`；若提示暂未支持，告诉用户敬请期待并停止。
 
 ## 前置条件 — 执行操作前必读
 
